@@ -16,11 +16,17 @@ export type pieceNameType = {
   [key: string]: string;
 };
 
-export type pieceType = {
+export type caseFilled = {
   color: COLOR;
+  isClicked:boolean;
   name?: pieceNameType;
+}
+
+export type caseEmptied = {
+  name?: pieceNameType;
+  canMoveHere:boolean
 };
 
-export type BoardType = (pieceType | undefined)[][];
+export type BoardType = (caseFilled | caseEmptied | undefined)[][];
 
 // type historique des coups joués
