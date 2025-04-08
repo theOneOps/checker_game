@@ -16,17 +16,14 @@ export type pieceNameType = {
   [key: string]: string;
 };
 
-export type caseFilled = {
-  color: COLOR;
-  isClicked:boolean;
+export type Case = {
+  type: "filled" | "empty";
   name?: pieceNameType;
-}
-
-export type caseEmptied = {
-  name?: pieceNameType;
-  canMoveHere:boolean
+  color?: COLOR; // present only when type === "filled"
+  isClicked?: boolean; // present only when type === "filled"
+  canMoveHere?: boolean; // present only when type === "empty"
 };
 
-export type BoardType = (caseFilled | caseEmptied | undefined)[][];
+export type BoardType = Case[][];
 
 // type historique des coups joués
