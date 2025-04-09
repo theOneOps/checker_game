@@ -22,6 +22,7 @@ export type Case = {
   color?: COLOR; // present only when type === "filled"
   isClicked?: boolean; // present only when type === "filled"
   canMoveHere?: boolean; // present only when type === "empty"
+  isQueen?:boolean; // present only if pawn become a queen
 };
 
 export type BoardType = Case[][];
