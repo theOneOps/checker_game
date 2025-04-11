@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   BoardType,
   COLOR,
+  historyGameType,
   LENGTH,
   positionType,
   WIDTH_CASE,
@@ -10,21 +11,28 @@ import {
   checkIfShouldPlay,
   getCellBgClass,
   moveFunc,
+  hasAnyCanTake,
 } from "../utils/logicFunctions";
 
 export default function GameBoard() {
-
   const [board, setBoard] = useState<BoardType>(
     Array.from({ length: LENGTH }, () =>
       Array.from({ length: LENGTH }, () => ({
         isClicked: false,
         canMoveHere: false,
+        canDisappear: false,
+        canTake: false,
+        isQueen: false,
         type: "empty",
       }))
     )
   );
 
+  const [historyGame, setHistoryGame] = useState<historyGameType>();
+
   const [currentPosition, setCurrentPosition] = useState<positionType>();
+
+  const [canTake, setCanTake] = useState(false)
 
   // state to keep track pof the game round
   const [gameRound, setGameRound] = useState(0);
@@ -83,65 +91,144 @@ export default function GameBoard() {
     });
   }, []);
 
+  useEffect(()=>{
+    setCanTake(()=>hasAnyCanTake(board))
+  },[board, gameRound])
+
+
   return (
-    <div className="flex">
-      {board.map((Col, j) => (
-        <div key={`${j}-${j}`} className="flex flex-col">
-          {Col.map((Row, i) => {
-            return (
+    canTake ?<div className="flex">
+    {board.map((Col, j) => (
+      <div key={`${j}-${j}`} className="flex flex-col">
+        {Col.map((Row, i) => {
+          return (
+            <div
+              key={i}
+              className={[
+                getCellBgClass({ Row, i, j }),
+                "border border-black",
+              ].join(" ")}
+              style={{
+                width: `${WIDTH_CASE}px`,
+                height: `${WIDTH_CASE}px`,
+                cursor: "pointer",
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+              {Row.type === "filled" ? (
+                <div
+                  key={i * j + 20}
+                  onClick={ Row.canTake
+                        ? () =>
+                            checkIfShouldPlay(
+                              board,
+                              { x: i, y: j },
+                              gameRound,
+                              setBoard,
+                              setCurrentPosition
+                            )
+                        : ()=>console.log("")}
+                  className="absolute w-[50px] h-[50px] rounded-4xl shadow-2xl"
+                  style={{
+                    backgroundColor: Row.color,
+                    border: Row.canTake ? "3px solid gold" : "none",
+                  }}>
+                  {`(${j}-${i})`}
+                </div>
+              ) : (
+                <div
+                  key={i * j + 10}
+                  onClick={
+                    Row.canMoveHere
+                      ? () =>
+                          moveFunc(
+                            gameRound,
+                            currentPosition!,
+                            { x: i, y: j },
+                            board,
+                            setBoard,
+                            setGameRound,
+                            historyGame,
+                            setHistoryGame,
+                             canTake
+                          )
+                      : undefined
+                  }
+                  className="absolute w-[50px] h-[50px] rounded-4xl shadow-2xl">
+                  {`(${j}-${i})`}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    ))}
+  </div>
+  :    <div className="flex">
+  {board.map((Col, j) => (
+    <div key={`${j}-${j}`} className="flex flex-col">
+      {Col.map((Row, i) => {
+        return (
+          <div
+            key={i}
+            className={[
+              getCellBgClass({ Row, i, j }),
+              "border border-black",
+            ].join(" ")}
+            style={{
+              width: `${WIDTH_CASE}px`,
+              height: `${WIDTH_CASE}px`,
+              cursor: "pointer",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+            {Row.type === "filled" ? (
               <div
-                key={i}
-                className={[
-                  getCellBgClass({ Row, i, j }),
-                  "border border-black",
-                ].join(" ")}
+                key={i * j + 20}
+                onClick={()=>checkIfShouldPlay(
+                          board,
+                          { x: i, y: j },
+                          gameRound,
+                          setBoard,
+                          setCurrentPosition)
+                }
+                className="absolute w-[50px] h-[50px] rounded-4xl shadow-2xl"
                 style={{
-                  width: `${WIDTH_CASE}px`,
-                  height: `${WIDTH_CASE}px`,
-                  cursor: "pointer",
-                  position: "relative",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  backgroundColor: `${Row.color}`,
                 }}>
-                {Row.type === "filled" ? (
-                  <div
-                    key={i * j + 20}
-                    onClick={() =>
-                      checkIfShouldPlay(
-                        board,
-                        { x: i, y: j },
-                        gameRound,
-                        setBoard,
-                        setCurrentPosition
-                      )
-                    }
-                    className="absolute w-[50px] h-[50px] rounded-4xl shadow-2xl"
-                    style={{
-                      backgroundColor: `${Row.color}`,
-                    }}>{`(${j}-${i})`}</div>
-                ) : (
-                  <div
-                    key={i * j + 10}
-                    onClick={() =>
-                      moveFunc(
-                        gameRound,
-                        currentPosition!,
-                        { x: i, y: j },
-                        board,
-                        setBoard,
-                        setGameRound
-                      )
-                    }
-                    className="absolute w-[50px] h-[50px] rounded-4xl shadow-2xl">
-                    {`(${j}-${i})`}
-                  </div>
-                )}
+                {`(${j}-${i})`}
               </div>
-            );
-          })}
-        </div>
-      ))}
+            ) : (
+              <div
+                key={i * j + 10}
+                onClick={() =>
+                        moveFunc(
+                          gameRound,
+                          currentPosition!,
+                          { x: i, y: j },
+                          board,
+                          setBoard,
+                          setGameRound,
+                          historyGame,
+                          setHistoryGame,
+                          canTake
+                        )}
+                className="absolute w-[50px] h-[50px] rounded-4xl shadow-2xl">
+                {`(${j}-${i})`}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
-  );
+  ))}
+  </div>
+  
+  )
 }
+
+

@@ -21,10 +21,14 @@ export type Case = {
   name?: pieceNameType;
   color?: COLOR; // present only when type === "filled"
   isClicked?: boolean; // present only when type === "filled"
-  canMoveHere?: boolean; // present only when type === "empty"
   isQueen?:boolean; // present only if pawn become a queen
+  canMoveHere?: boolean; // present only when type === "empty"
+  canDisappear?:boolean // present if pawn should disappear
+  canTake?:boolean; //  present if possibility of taking some adverse pawns
 };
 
 export type BoardType = Case[][];
 
 // type historique des coups joués
+
+export type historyGameType = [positionType,positionType][] // old and new position of a pawn
