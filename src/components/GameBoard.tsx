@@ -75,7 +75,7 @@ export default function GameBoard({board,setBoard,gameRound, setGameRound, setLe
                     backgroundColor: Row.color,
                     border: Row.canTake ? "3px solid gold" : "none",
                   }}>
-                  {`(${j}-${i})`}
+                  {/* {`(${j}-${i})`} */}
                 </div>
               ) : (
                 <div
@@ -99,7 +99,7 @@ export default function GameBoard({board,setBoard,gameRound, setGameRound, setLe
                       : ()=>console.log("")
                   }
                   className="absolute w-[50px] h-[50px] rounded-4xl shadow-2xl">
-                  {`(${j}-${i})`}
+                  {/* {`(${j}-${i})`} */}
                 </div>
               )}
             </div>
@@ -142,7 +142,7 @@ export default function GameBoard({board,setBoard,gameRound, setGameRound, setLe
                 style={{
                   backgroundColor: `${Row.color}`,
                 }}>
-                {`(${j}-${i})`}
+                {/* {`(${j}-${i})`} */}
               </div>
             ) : (
               <div
@@ -162,7 +162,7 @@ export default function GameBoard({board,setBoard,gameRound, setGameRound, setLe
                              setLeftNbBlack
                         )}
                 className="absolute w-[50px] h-[50px] rounded-4xl shadow-2xl">
-                {`(${j}-${i})`}
+                {/* {`(${j}-${i})`} */}
               </div>
             )}
           </div>

@@ -13,8 +13,8 @@ export default function Score({
 }: scoreType) {
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex gap-1 justify-center">
-        <span>Turn of</span>
+      <div className="flex gap-3 justify-center">
+        <span className="text-white">Turn of</span>
         <div className="w-[25px] h-[25px] rounded-4xl shadow-2xl"
         style={gameRound % 2 === 0 ? {backgroundColor: "#beb2ae"} : {backgroundColor: "black"}}
         ></div>
@@ -26,7 +26,7 @@ export default function Score({
           <div className="flex gap-1">
             <div className="w-[25px] h-[25px] rounded-4xl shadow-2xl"
             style={{backgroundColor: "black"}}></div> {/* black */} 
-            <span>left : {leftNbBlack}</span>
+            <span  className="text-white">left : {leftNbBlack}</span>
           </div>
         </div>
 
@@ -35,7 +35,7 @@ export default function Score({
             <div className="w-[25px] h-[25px] rounded-4xl shadow-2xl"
             style={{backgroundColor: "#beb2ae"}}
             ></div> {/* white */} 
-            <span>left : {leftNbWhite}</span>
+            <span  className="text-white">left : {leftNbWhite}</span>
           </div>
         </div>
 

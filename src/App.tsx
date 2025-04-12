@@ -116,7 +116,7 @@ export default function App() {
             historyGame={historyGame}
             setHistoryGame={setHistoryGame}
           />
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-2">
             <Score
               gameRound={gameRound}
               leftNbWhite={leftNbWhite}
