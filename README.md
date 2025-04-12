@@ -1,4 +1,4 @@
-## here is a checker's game I have done 
+## Here is a checker's game I have done 
 
 
 To launch the game, just execute those commands:
