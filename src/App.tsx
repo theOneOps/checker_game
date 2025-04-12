@@ -127,8 +127,6 @@ export default function App() {
               historyGame={historyGame}
               setHistoryGame={setHistoryGame}
               setGameRound = {setGameRound}
-              setLeftNbWhite = {setLeftNbWhite}
-              setLeftNbBlack = {setLeftNbBlack}
             />
           </div>
         </div>

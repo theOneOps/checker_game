@@ -8,16 +8,14 @@ type GoBackTypeProps = {
   historyGame:historyGameType | undefined,
   setHistoryGame: React.Dispatch<React.SetStateAction<historyGameType | undefined>>,
   setGameRound: React.Dispatch<React.SetStateAction<number>>,
-  setLeftNbWhite: React.Dispatch<React.SetStateAction<number>>,
-  setLeftNbBlack: React.Dispatch<React.SetStateAction<number>>,
 }
 
-export default function GoBack({ setBoard, historyGame, setHistoryGame, setGameRound, setLeftNbWhite, setLeftNbBlack}:GoBackTypeProps) {
+export default function GoBack({ setBoard, historyGame, setHistoryGame, setGameRound}:GoBackTypeProps) {
 
   return (
     <button
     className="cursor-pointer"
-    onClick={()=>goBack(setBoard, setGameRound, historyGame, setHistoryGame, setLeftNbWhite, setLeftNbBlack)}
+    onClick={()=>goBack(setBoard, setGameRound, historyGame, setHistoryGame)}
     >Go Back</button>
   )
 }

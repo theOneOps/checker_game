@@ -359,8 +359,6 @@ export function goBack(
   setGameRound: React.Dispatch<React.SetStateAction<number>>,
   historyGame: historyGameType | undefined,
   setHistoryGame: React.Dispatch<React.SetStateAction<historyGameType | undefined>>,
-  setLeftNbWhite: React.Dispatch<React.SetStateAction<number>>,
-  setLeftNbBlack: React.Dispatch<React.SetStateAction<number>>
 ) {
   if (!historyGame || historyGame.length === 0) return;
 
