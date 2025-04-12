@@ -12,6 +12,27 @@ export const hasAnyCanTake = (board: BoardType) => {
   return board.some((col) => col.some((cell) => cell.canTake === true));
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
+export const getCellBgClass = ({
+  Row,
+  i,
+  j,
+}: {
+  Row: Case;
+  i: number;
+  j: number;
+}) => {
+  if (Row.isClicked || Row.canMoveHere) return "bg-green-900";
+  return (i + j) % 2 === 0 ? "bg-amber-200" : "bg-orange-950";
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function isPositionOnBoard(position: positionType): boolean {
+  const { x, y } = position;
+  return x >= 0 && x <= LENGTH - 1 && y >= 0 && y <= LENGTH - 1 ? true : false;
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
 export function clickedFillCase(
   board: BoardType,
   position: positionType
@@ -60,11 +81,8 @@ export function clickedFillCase(
   return newGrid;
 }
 
-export function isPositionOnBoard(position: positionType): boolean {
-  const { x, y } = position;
-  return x >= 0 && x <= LENGTH - 1 && y >= 0 && y <= LENGTH - 1 ? true : false;
-}
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function allDiagonalMoveHere(
   board: BoardType,
   position: positionType
@@ -73,11 +91,6 @@ export function allDiagonalMoveHere(
 
   function addOnBoard({ x, y }: positionType) {
     if (isPositionOnBoard({ x, y })) {
-      // if (board[y][x].type === "filled")
-      // {
-      //   results.push({ x, y });
-      //   return
-      // }
       if (board[y][x].type === "empty") results.push({ x, y });
     }
   }
@@ -93,37 +106,12 @@ export function allDiagonalMoveHere(
     addOnBoard({ x: x + 1, y: y + 1 });
   }
 
-  // diagonal top left
-
-  // diagonal top right
-
-  // we do this ⬇️ only for a queen pawn
-
-  // // diagonal bottom left
-
-  // addOnBoard({x:x-1, y:y+1})
-
-  // // diagonal bottom right
-  // addOnBoard({x:x+1, y:y+1})
-
   console.log(results);
 
   return results;
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const getCellBgClass = ({
-  Row,
-  i,
-  j,
-}: {
-  Row: Case;
-  i: number;
-  j: number;
-}) => {
-  if (Row.isClicked || Row.canMoveHere) return "bg-green-900";
-  return (i + j) % 2 === 0 ? "bg-amber-200" : "bg-orange-950";
-};
+
 
 export function ChangePosition(
   board: BoardType,
@@ -136,7 +124,9 @@ export function ChangePosition(
   setHistoryGame: React.Dispatch<
     React.SetStateAction<historyGameType | undefined>
   >,
-  canTake: boolean
+  canTake: boolean,
+  setLeftNbWhite: React.Dispatch<React.SetStateAction<number>>,
+  setLeftNbBlack: React.Dispatch<React.SetStateAction<number>>
 ) {
   const { x, y } = currentPosition;
 
@@ -162,6 +152,7 @@ export function ChangePosition(
 
         newBoard[y][x] = {
           type: "empty",
+          color:undefined
         };
 
         // Supprimer le pion adverse s'il y a eu prise
@@ -176,20 +167,37 @@ export function ChangePosition(
             newBoard[takenY][takenX].type === "filled" &&
             newBoard[takenY][takenX].color !== color
           ) {
+            const oldColor = newBoard[takenY][takenX].color
+            if (oldColor === COLOR.Black)
+            {
+              setLeftNbBlack(prevNb=> prevNb - 1)
+            }
+            else
+            {
+              setLeftNbWhite(prevNb=> prevNb - 1)
+            }
             newBoard[takenY][takenX] = {
               type: "empty",
+              color:undefined
             };
+
+            if (historyGame !== undefined) {
+              const newHistoryGame = [...historyGame];
+              setHistoryGame([...newHistoryGame, [oldColor!, {x:takenX, y:takenY}, {x:-1,y:-1}]]);
+            } else {
+              setHistoryGame([[oldColor!, {x:takenX, y:takenY}, {x:-1,y:-1}]]);
+            }
           }
         }
 
         setGameRound((round) => round + 1);
 
-        // Met à jour l’historique
+        // update history of moves played
         if (historyGame !== undefined) {
           const newHistoryGame = [...historyGame];
-          setHistoryGame([...newHistoryGame, [currentPosition, newPosition]]);
+          setHistoryGame([...newHistoryGame, [color, currentPosition, newPosition]]);
         } else {
-          setHistoryGame([[currentPosition, newPosition]]);
+          setHistoryGame([[color, currentPosition, newPosition]]);
         }
 
         return newBoard;
@@ -211,7 +219,9 @@ export function moveFunc(
   setHistoryGame: React.Dispatch<
     React.SetStateAction<historyGameType | undefined>
   >,
-  canTake:boolean
+  canTake:boolean, 
+  setLeftNbWhite: React.Dispatch<React.SetStateAction<number>>,
+  setLeftNbBlack: React.Dispatch<React.SetStateAction<number>>
 ) {
   if (gameRound % 2 == 0) {
     ChangePosition(
@@ -223,7 +233,9 @@ export function moveFunc(
       setGameRound,
       historyGame,
       setHistoryGame,
-      canTake
+      canTake,
+      setLeftNbWhite,
+      setLeftNbBlack
     );
     updateBoardWithWinning(setBoard, COLOR.Black);
   } else {
@@ -236,7 +248,9 @@ export function moveFunc(
       setGameRound,
       historyGame,
       setHistoryGame,
-      canTake
+      canTake,
+      setLeftNbWhite,
+      setLeftNbBlack
     );
     updateBoardWithWinning(setBoard, COLOR.White);
   }
@@ -244,7 +258,7 @@ export function moveFunc(
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function checkIfShouldPlay(
-  board: BoardType,
+  getBoard: () => BoardType,
   { x, y }: positionType,
   gameRound: number,
   setBoard: React.Dispatch<React.SetStateAction<BoardType>>,
@@ -252,6 +266,7 @@ export function checkIfShouldPlay(
     React.SetStateAction<positionType | undefined>
   >
 ) {
+  const board = getBoard(); // lecture au moment du clic
   if (gameRound % 2 == 0) {
     if (board[y][x].color === COLOR.White)
       clickFillCase(board, { x, y }, setBoard, setCurrentPosition);
@@ -270,14 +285,13 @@ export function clickFillCase(
     React.SetStateAction<positionType | undefined>
   >
 ) {
-  if (board[y][x].isClicked == true) return;
+  if (board[y][x].isClicked === true) return;
 
-  setBoard((prevBoard) => {
-    const newBoard = clickedFillCase(prevBoard, { x, y });
-    setCurrentPosition({ x, y });
-    return newBoard;
-  });
+  const updatedBoard = clickedFillCase(board, { x, y });
+  setBoard(updatedBoard);             // first we update the board
+  setCurrentPosition({ x, y });       // then we update the position
 }
+
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function updateBoardWithWinning(
@@ -336,4 +350,58 @@ export function updateBoardWithWinning(
 
     return newBoard;
   });
+}
+
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function goBack(
+  setBoard: React.Dispatch<React.SetStateAction<BoardType>>,
+  setGameRound: React.Dispatch<React.SetStateAction<number>>,
+  historyGame: historyGameType | undefined,
+  setHistoryGame: React.Dispatch<React.SetStateAction<historyGameType | undefined>>,
+  setLeftNbWhite: React.Dispatch<React.SetStateAction<number>>,
+  setLeftNbBlack: React.Dispatch<React.SetStateAction<number>>
+) {
+  if (!historyGame || historyGame.length === 0) return;
+
+  const lastMove = historyGame[historyGame.length - 1];
+  const [color, oldPos, newPos] = lastMove;
+
+  setBoard((prevBoard) => {
+    const newBoard: BoardType = prevBoard.map((row) =>
+      row.map((cell) => ({
+        ...cell,
+        canMoveHere: false,
+        canTake: false,
+        canDisappear: false,
+        isClicked: false,
+      }))
+    );
+
+    if (newPos.x === -1 && newPos.y === -1) {
+      // Un pion a été capturé → on le remet
+      newBoard[oldPos.y][oldPos.x] = {
+        type: "filled",
+        color,
+      };
+    } else {
+      // Sinon, on annule juste le déplacement
+      newBoard[oldPos.y][oldPos.x] = {
+        type: "filled",
+        color,
+      };
+
+      newBoard[newPos.y][newPos.x] = {
+        type: "empty",
+      };
+    }
+
+    return newBoard;
+  });
+
+  // Mise à jour du tour et de l'historique
+  setGameRound((round) => round - 1);
+  setHistoryGame((prev) =>
+    prev && prev.length > 0 ? prev.slice(0, prev.length - 1) : undefined
+  );
 }

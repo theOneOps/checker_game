@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   BoardType,
-  COLOR,
   historyGameType,
-  LENGTH,
   positionType,
   WIDTH_CASE,
 } from "../utils/types";
@@ -14,82 +12,24 @@ import {
   hasAnyCanTake,
 } from "../utils/logicFunctions";
 
-export default function GameBoard() {
-  const [board, setBoard] = useState<BoardType>(
-    Array.from({ length: LENGTH }, () =>
-      Array.from({ length: LENGTH }, () => ({
-        isClicked: false,
-        canMoveHere: false,
-        canDisappear: false,
-        canTake: false,
-        isQueen: false,
-        type: "empty",
-      }))
-    )
-  );
+type gameBoardType = {
+  board:BoardType,
+  setBoard: React.Dispatch<React.SetStateAction<BoardType>>,
+  gameRound:number,
+  setGameRound: React.Dispatch<React.SetStateAction<number>>,
+  setLeftNbWhite: React.Dispatch<React.SetStateAction<number>>,
+  setLeftNbBlack: React.Dispatch<React.SetStateAction<number>>,
+  historyGame: historyGameType | undefined,
+  setHistoryGame : React.Dispatch<React.SetStateAction<historyGameType | undefined>>
+}
 
-  const [historyGame, setHistoryGame] = useState<historyGameType>();
+export default function GameBoard({board,setBoard,gameRound, setGameRound, setLeftNbWhite, setLeftNbBlack, historyGame, setHistoryGame}:gameBoardType) {
+  
 
   const [currentPosition, setCurrentPosition] = useState<positionType>();
 
   const [canTake, setCanTake] = useState(false)
-
-  // state to keep track pof the game round
-  const [gameRound, setGameRound] = useState(0);
-
-  // Placement of pawns on the board
-  useEffect(() => {
-    setBoard((grid) => {
-      const newGrid = [...grid];
-
-      newGrid.forEach((Col, j) => {
-        Col.forEach((Row, i) => {
-          if ([0, 1, 2, 3].includes(i)) {
-            if (i % 2 == 0) {
-              if ((i + j) % 2 !== 0) {
-                newGrid[j][i] = {
-                  color: COLOR.Black,
-                  isClicked: false,
-                  canMoveHere: false,
-                  type: "filled",
-                };
-              }
-            } else {
-              if ((i + j) % 2 !== 0) {
-                newGrid[j][i] = {
-                  color: COLOR.Black,
-                  isClicked: false,
-                  canMoveHere: false,
-                  type: "filled",
-                };
-              }
-            }
-          } else if ([6, 7, 8, 9].includes(i)) {
-            if (i % 2 == 0) {
-              if ((i + j) % 2 !== 0) {
-                newGrid[j][i] = {
-                  color: COLOR.White,
-                  isClicked: false,
-                  canMoveHere: false,
-                  type: "filled",
-                };
-              }
-            } else {
-              if ((i + j) % 2 !== 0) {
-                newGrid[j][i] = {
-                  color: COLOR.White,
-                  isClicked: false,
-                  canMoveHere: false,
-                  type: "filled",
-                };
-              }
-            }
-          }
-        });
-      });
-      return newGrid;
-    });
-  }, []);
+  
 
   useEffect(()=>{
     setCanTake(()=>hasAnyCanTake(board))
@@ -123,7 +63,7 @@ export default function GameBoard() {
                   onClick={ Row.canTake
                         ? () =>
                             checkIfShouldPlay(
-                              board,
+                              ()=>board,
                               { x: i, y: j },
                               gameRound,
                               setBoard,
@@ -152,9 +92,11 @@ export default function GameBoard() {
                             setGameRound,
                             historyGame,
                             setHistoryGame,
-                             canTake
+                             canTake,
+                             setLeftNbWhite,
+                             setLeftNbBlack
                           )
-                      : undefined
+                      : ()=>console.log("")
                   }
                   className="absolute w-[50px] h-[50px] rounded-4xl shadow-2xl">
                   {`(${j}-${i})`}
@@ -190,8 +132,8 @@ export default function GameBoard() {
               <div
                 key={i * j + 20}
                 onClick={()=>checkIfShouldPlay(
-                          board,
-                          { x: i, y: j },
+                  ()=>board,
+                  { x: i, y: j },
                           gameRound,
                           setBoard,
                           setCurrentPosition)
@@ -215,7 +157,9 @@ export default function GameBoard() {
                           setGameRound,
                           historyGame,
                           setHistoryGame,
-                          canTake
+                          canTake,
+                          setLeftNbWhite,
+                             setLeftNbBlack
                         )}
                 className="absolute w-[50px] h-[50px] rounded-4xl shadow-2xl">
                 {`(${j}-${i})`}
